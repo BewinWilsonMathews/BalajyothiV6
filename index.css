@@ -1708,7 +1708,7 @@
     width: 100%;
     left: 0;
     height: 100%;
-    top: 0;
+    top: 0%;
   }
 }.u-section-8 .u-sheet-1 {
   min-height: 419px;
@@ -3872,7 +3872,7 @@
 .u-section-11 .u-text-12 > .u-container-layout:before {
   transition-property: fill, color, background-color, stroke-width, border-style, border-width, border-top-width, border-left-width, border-right-width, border-bottom-width, custom-border, borders, box-shadow, text-shadow, opacity, border-radius, stroke, border-color, font-size, font-style, font-weight, text-decoration, letter-spacing, transform, background-image, image-zoom, background-size, background-position;
 } .u-section-12 {
-  min-height: 509px;
+  min-height: 561px;
 }
 
 .u-section-12 .u-text-1 {
@@ -3909,7 +3909,7 @@
 .u-section-12 .u-image-1 {
   width: 191px;
   height: 191px;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJtYW4iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBzdHlsZT0id2lkdGg6IDI1NnB4OyBoZWlnaHQ6IDI1NnB4OyI+CjxyZWN0IGZpbGw9IiNDNkQ4RTEiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2Ii8+CjxwYXRoIGZpbGw9IiM3Rjk2QTYiIGQ9Ik0xNzIuNiw5My40YzExLjYtNDQuNy0xMS4yLTQ4LjYtMTEuNy00OC4xYy0yMi40LTMxLjMtOTAuMy0xNi44LTc3LjQsNDguMWMtMTMuMy0yLjQtMS44LDMxLjYsMy43LDMyLjEKCWMwLDAsMCwwLDAsMGMwLjIsMCwwLjMsMCwwLjUtMC4xYzE0LjQsNDkuNyw2Mi43LDUwLjIsODAuNywwQzE3Mi4zLDEyNy4zLDE4Ni41LDkzLjMsMTcyLjYsOTMuNHoiLz4KPHBhdGggZmlsbD0iIzdGOTZBNiIgZD0iTTIwNS40LDE3Ny45Yy0yNC02LjEtNDMuNS0xOS44LTQzLjUtMTkuOGwtMjAuNiw2NC44bC04LTIyLjhjMTkuNy0yNy41LTMwLjMtMjcuNS0xMC42LDBsLTgsMjIuOEw5NCwxNTguMQoJYzAsMC0xOS41LDEzLjctNDMuNSwxOS44QzMyLjcsMTgyLjUsMzAsMjU2LDMwLDI1NmgxOTZDMjI2LDI1NiwyMjMuMywxODIuNSwyMDUuNCwxNzcuOXoiLz4KPC9zdmc+Cg==");
+  background-image: url("images/HaniyaRahman.jpeg");
   background-position: 50% 50%;
   margin: 0 0 0 13px;
 }
@@ -3917,7 +3917,7 @@
 .u-section-12 .u-text-3 {
   font-weight: 700;
   font-size: 2.25rem;
-  margin: 20px 4px 0;
+  margin: 20px 4px 0 0;
 }
 
 .u-section-12 .u-text-4 {
@@ -3936,7 +3936,7 @@
 .u-section-12 .u-image-2 {
   width: 191px;
   height: 191px;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJtYW4iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBzdHlsZT0id2lkdGg6IDI1NnB4OyBoZWlnaHQ6IDI1NnB4OyI+CjxyZWN0IGZpbGw9IiNDNkQ4RTEiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2Ii8+CjxwYXRoIGZpbGw9IiM3Rjk2QTYiIGQ9Ik0xNzIuNiw5My40YzExLjYtNDQuNy0xMS4yLTQ4LjYtMTEuNy00OC4xYy0yMi40LTMxLjMtOTAuMy0xNi44LTc3LjQsNDguMWMtMTMuMy0yLjQtMS44LDMxLjYsMy43LDMyLjEKCWMwLDAsMCwwLDAsMGMwLjIsMCwwLjMsMCwwLjUtMC4xYzE0LjQsNDkuNyw2Mi43LDUwLjIsODAuNywwQzE3Mi4zLDEyNy4zLDE4Ni41LDkzLjMsMTcyLjYsOTMuNHoiLz4KPHBhdGggZmlsbD0iIzdGOTZBNiIgZD0iTTIwNS40LDE3Ny45Yy0yNC02LjEtNDMuNS0xOS44LTQzLjUtMTkuOGwtMjAuNiw2NC44bC04LTIyLjhjMTkuNy0yNy41LTMwLjMtMjcuNS0xMC42LDBsLTgsMjIuOEw5NCwxNTguMQoJYzAsMC0xOS41LDEzLjctNDMuNSwxOS44QzMyLjcsMTgyLjUsMzAsMjU2LDMwLDI1NmgxOTZDMjI2LDI1NiwyMjMuMywxODIuNSwyMDUuNCwxNzcuOXoiLz4KPC9zdmc+Cg==");
+  background-image: url("images/DeekshithPraveen.jpg");
   background-position: 50% 50%;
   margin: 0 0 0 13px;
 }
@@ -3945,7 +3945,7 @@
   font-weight: 700;
   text-transform: none;
   font-size: 2.25rem;
-  margin: 20px 4px 0;
+  margin: 20px 4px 0 0;
 }
 
 .u-section-12 .u-text-6 {
@@ -3964,7 +3964,7 @@
 .u-section-12 .u-image-3 {
   width: 191px;
   height: 191px;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJtYW4iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBzdHlsZT0id2lkdGg6IDI1NnB4OyBoZWlnaHQ6IDI1NnB4OyI+CjxyZWN0IGZpbGw9IiNDNkQ4RTEiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2Ii8+CjxwYXRoIGZpbGw9IiM3Rjk2QTYiIGQ9Ik0xNzIuNiw5My40YzExLjYtNDQuNy0xMS4yLTQ4LjYtMTEuNy00OC4xYy0yMi40LTMxLjMtOTAuMy0xNi44LTc3LjQsNDguMWMtMTMuMy0yLjQtMS44LDMxLjYsMy43LDMyLjEKCWMwLDAsMCwwLDAsMGMwLjIsMCwwLjMsMCwwLjUtMC4xYzE0LjQsNDkuNyw2Mi43LDUwLjIsODAuNywwQzE3Mi4zLDEyNy4zLDE4Ni41LDkzLjMsMTcyLjYsOTMuNHoiLz4KPHBhdGggZmlsbD0iIzdGOTZBNiIgZD0iTTIwNS40LDE3Ny45Yy0yNC02LjEtNDMuNS0xOS44LTQzLjUtMTkuOGwtMjAuNiw2NC44bC04LTIyLjhjMTkuNy0yNy41LTMwLjMtMjcuNS0xMC42LDBsLTgsMjIuOEw5NCwxNTguMQoJYzAsMC0xOS41LDEzLjctNDMuNSwxOS44QzMyLjcsMTgyLjUsMzAsMjU2LDMwLDI1NmgxOTZDMjI2LDI1NiwyMjMuMywxODIuNSwyMDUuNCwxNzcuOXoiLz4KPC9zdmc+Cg==");
+  background-image: url("images/Nandhagovind.jpeg");
   background-position: 50% 50%;
   margin: 0 0 0 13px;
 }
@@ -3973,7 +3973,7 @@
   font-weight: 700;
   text-transform: none;
   font-size: 2.25rem;
-  margin: 20px 4px 0;
+  margin: 20px 4px 0 0;
 }
 
 .u-section-12 .u-text-8 {
@@ -3992,7 +3992,7 @@
 .u-section-12 .u-image-4 {
   width: 191px;
   height: 191px;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJtYW4iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBzdHlsZT0id2lkdGg6IDI1NnB4OyBoZWlnaHQ6IDI1NnB4OyI+CjxyZWN0IGZpbGw9IiNDNkQ4RTEiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2Ii8+CjxwYXRoIGZpbGw9IiM3Rjk2QTYiIGQ9Ik0xNzIuNiw5My40YzExLjYtNDQuNy0xMS4yLTQ4LjYtMTEuNy00OC4xYy0yMi40LTMxLjMtOTAuMy0xNi44LTc3LjQsNDguMWMtMTMuMy0yLjQtMS44LDMxLjYsMy43LDMyLjEKCWMwLDAsMCwwLDAsMGMwLjIsMCwwLjMsMCwwLjUtMC4xYzE0LjQsNDkuNyw2Mi43LDUwLjIsODAuNywwQzE3Mi4zLDEyNy4zLDE4Ni41LDkzLjMsMTcyLjYsOTMuNHoiLz4KPHBhdGggZmlsbD0iIzdGOTZBNiIgZD0iTTIwNS40LDE3Ny45Yy0yNC02LjEtNDMuNS0xOS44LTQzLjUtMTkuOGwtMjAuNiw2NC44bC04LTIyLjhjMTkuNy0yNy41LTMwLjMtMjcuNS0xMC42LDBsLTgsMjIuOEw5NCwxNTguMQoJYzAsMC0xOS41LDEzLjctNDMuNSwxOS44QzMyLjcsMTgyLjUsMzAsMjU2LDMwLDI1NmgxOTZDMjI2LDI1NiwyMjMuMywxODIuNSwyMDUuNCwxNzcuOXoiLz4KPC9zdmc+Cg==");
+  background-image: url("images/GouriManesh.jpg");
   background-position: 50% 50%;
   margin: 0 0 0 13px;
 }
@@ -4001,7 +4001,7 @@
   font-weight: 700;
   text-transform: none;
   font-size: 2.25rem;
-  margin: 20px 4px 0;
+  margin: 20px 4px 0 0;
 }
 
 .u-section-12 .u-text-10 {
@@ -4020,8 +4020,9 @@
 .u-section-12 .u-image-5 {
   width: 191px;
   height: 191px;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJtYW4iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBzdHlsZT0id2lkdGg6IDI1NnB4OyBoZWlnaHQ6IDI1NnB4OyI+CjxyZWN0IGZpbGw9IiNDNkQ4RTEiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2Ii8+CjxwYXRoIGZpbGw9IiM3Rjk2QTYiIGQ9Ik0xNzIuNiw5My40YzExLjYtNDQuNy0xMS4yLTQ4LjYtMTEuNy00OC4xYy0yMi40LTMxLjMtOTAuMy0xNi44LTc3LjQsNDguMWMtMTMuMy0yLjQtMS44LDMxLjYsMy43LDMyLjEKCWMwLDAsMCwwLDAsMGMwLjIsMCwwLjMsMCwwLjUtMC4xYzE0LjQsNDkuNyw2Mi43LDUwLjIsODAuNywwQzE3Mi4zLDEyNy4zLDE4Ni41LDkzLjMsMTcyLjYsOTMuNHoiLz4KPHBhdGggZmlsbD0iIzdGOTZBNiIgZD0iTTIwNS40LDE3Ny45Yy0yNC02LjEtNDMuNS0xOS44LTQzLjUtMTkuOGwtMjAuNiw2NC44bC04LTIyLjhjMTkuNy0yNy41LTMwLjMtMjcuNS0xMC42LDBsLTgsMjIuOEw5NCwxNTguMQoJYzAsMC0xOS41LDEzLjctNDMuNSwxOS44QzMyLjcsMTgyLjUsMzAsMjU2LDMwLDI1NmgxOTZDMjI2LDI1NiwyMjMuMywxODIuNSwyMDUuNCwxNzcuOXoiLz4KPC9zdmc+Cg==");
-  background-position: 50% 50%;
+  background-image: url("images/AntonyJohn.jpg");
+  background-position: 50% 97.12%;
+  background-size: cover;
   margin: 0 0 0 13px;
 }
 
@@ -4029,7 +4030,7 @@
   font-weight: 700;
   text-transform: none;
   font-size: 2.25rem;
-  margin: 20px 4px 0;
+  margin: 20px 4px 0 0;
 }
 
 .u-section-12 .u-text-12 {
@@ -4039,7 +4040,7 @@
 
 .u-section-12 .u-list-2 {
   width: 1px;
-  margin: -514px auto 60px;
+  margin: -514px auto 86px;
 }
 
 .u-section-12 .u-repeater-2 {
@@ -4077,7 +4078,6 @@
   }
 
   .u-section-12 .u-text-3 {
-    margin-left: 0;
     margin-right: 0;
   }
 
@@ -4095,7 +4095,6 @@
   }
 
   .u-section-12 .u-text-5 {
-    margin-left: 0;
     margin-right: 0;
   }
 
@@ -4113,7 +4112,6 @@
   }
 
   .u-section-12 .u-text-7 {
-    margin-left: 0;
     margin-right: 0;
   }
 
@@ -4131,7 +4129,6 @@
   }
 
   .u-section-12 .u-text-9 {
-    margin-left: 0;
     margin-right: 0;
   }
 
@@ -4149,7 +4146,6 @@
   }
 
   .u-section-12 .u-text-11 {
-    margin-left: 0;
     margin-right: 0;
   }
 
@@ -4331,6 +4327,8 @@
   .u-section-12 .u-image-2 {
     width: 213px;
     height: 213px;
+    background-position: 50% 0%;
+    background-size: cover;
     margin-left: auto;
     margin-right: auto;
   }
@@ -4358,6 +4356,8 @@
   .u-section-12 .u-image-3 {
     width: 213px;
     height: 213px;
+    background-position: 50% 0%;
+    background-size: cover;
     margin-left: auto;
     margin-right: auto;
   }
@@ -4435,13 +4435,12 @@
   }
 } .u-section-13 {
   background-image: none;
-  min-height: 933px;
+  min-height: 1021px;
 }
 
 .u-section-13 .u-image-1 {
   height: 578px;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0;
 }
 
 .u-section-13 .u-list-1 {
@@ -4629,7 +4628,12 @@
 
 @media (max-width: 1199px) {
    .u-section-13 {
-    min-height: 828px;
+    min-height: 916px;
+  }
+
+  .u-section-13 .u-image-1 {
+    margin-right: initial;
+    margin-left: initial;
   }
 
   .u-section-13 .u-list-1 {
@@ -4698,6 +4702,8 @@
 
   .u-section-13 .u-image-1 {
     height: 508px;
+    margin-right: initial;
+    margin-left: initial;
   }
 
   .u-section-13 .u-list-1 {
