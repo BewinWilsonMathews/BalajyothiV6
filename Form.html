@@ -351,43 +351,168 @@
     </form>
   </div>
 
-  <script>
-    /* District logic (same as before) */
-    const districtSelect = document.getElementById("district");
-    const stateSelect = document.getElementById("state");
+<script type="module">
+  // ---- 0) Firebase config (use exactly what console shows) ----
+  const firebaseConfig = {
+    apiKey: "AIzaSyAsQsDsbTp_UB6qyDgxQLwhVBs9UrCuors",
+    authDomain: "elocution-form.firebaseapp.com",
+    projectId: "elocution-form",
+    storageBucket: "elocution-form.firebasestorage.app",
+    messagingSenderId: "936475111029",
+    appId: "1:936475111029:web:33e0ddff32913e0f2e923c"
+  };
 
-    const districts = {
-      "Kerala": [
-        "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha",
-        "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad",
-        "Malappuram", "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
-      ],
-      "Tamil Nadu": [
-        "Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem",
-        "Erode", "Thanjavur", "Tirunelveli", "Vellore", "Thoothukudi",
-        "Dindigul", "Namakkal", "Virudhunagar", "Krishnagiri", "Dharmapuri"
-      ]
-    };
+  // ---- 1) Import only app, storage and firestore (no auth) ----
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    stateSelect.addEventListener("change", () => {
-      const selectedState = stateSelect.value;
-      districtSelect.innerHTML = '<option value="">-- Select District --</option>';
-      if (selectedState && districts[selectedState]) {
-        districts[selectedState].forEach(dist => {
-          const opt = document.createElement("option");
-          opt.value = dist;
-          opt.textContent = dist;
-          districtSelect.appendChild(opt);
-        });
-      }
-    });
+  // ---- 2) Init Firebase services ----
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+  const db = getFirestore(app);
 
-    /* Temporary submit handler (replace with backend integration) */
-    document.getElementById("submissionForm").addEventListener("submit", e => {
-      e.preventDefault();
-      // Basic client-side validation note: file input presence is required
-      alert("Form submitted successfully! (Connect to backend later)");
-    });
-  </script>
+  // ---- 3) Keep your state/district logic (unchanged) ----
+  const districtSelect = document.getElementById("district");
+  const stateSelect = document.getElementById("state");
+
+  const districts = {
+    "Kerala": [
+      "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha",
+      "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad",
+      "Malappuram", "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
+    ],
+    "Tamil Nadu": [
+      "Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem",
+      "Erode", "Thanjavur", "Tirunelveli", "Vellore", "Thoothukudi",
+      "Dindigul", "Namakkal", "Virudhunagar", "Krishnagiri", "Dharmapuri"
+    ]
+  };
+
+  stateSelect.addEventListener("change", () => {
+    const selectedState = stateSelect.value;
+    districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+    if (selectedState && districts[selectedState]) {
+      districts[selectedState].forEach(dist => {
+        const opt = document.createElement("option");
+        opt.value = dist;
+        opt.textContent = dist;
+        districtSelect.appendChild(opt);
+      });
+    }
+  });
+
+  // ---- 4) Form submit + upload logic (no auth) ----
+  const form = document.getElementById("submissionForm");
+  const fileInput = document.getElementById("video");
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  function setButtonState(text, disabled = false) {
+    submitBtn.textContent = text;
+    submitBtn.disabled = disabled;
+  }
+
+  function showProgress(pct) {
+    setButtonState(pct < 100 ? `Uploading... ${Math.round(pct)}%` : `Saving...`, pct < 100);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select a video file to upload.");
+      return;
+    }
+
+    // Client-side size limit (600 MB)
+    const MAX_BYTES = 600 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      alert("Video too large. Please upload a file smaller than 600 MB.");
+      return;
+    }
+
+    // Read form fields
+    const name = document.getElementById("student_name").value.trim();
+    const contact1 = document.getElementById("contact1").value.trim();
+    const contact2 = document.getElementById("contact2").value.trim();
+    const club = document.getElementById("club_name").value.trim();
+    const genderEl = form.querySelector('input[name="gender"]:checked');
+    const gender = genderEl ? genderEl.value : "";
+    const memberEl = form.querySelector('input[name="member"]:checked');
+    const member = memberEl ? memberEl.value : "";
+    const cls = document.getElementById("class_studying").value.trim();
+    const category = document.getElementById("category").value;
+    const school = document.getElementById("school").value.trim();
+    const residence = document.getElementById("residence").value.trim();
+    const state = document.getElementById("state").value;
+    const district = document.getElementById("district").value;
+
+    if (!name || !contact1) {
+      alert("Please fill required fields.");
+      return;
+    }
+
+    try {
+      setButtonState("Preparing upload...", true);
+
+      // Storage path (timestamp + safe filename)
+      const ts = Date.now();
+      const safeFileName = file.name.replace(/\s+/g, "_").replace(/[^\w\-.]/g, "");
+      const path = `submissions/${ts}_${safeFileName}`;
+      const sRef = storageRef(storage, path);
+
+      const uploadTask = uploadBytesResumable(sRef, file, { contentType: file.type });
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          showProgress(pct);
+        },
+        (err) => {
+          console.error("Upload failed:", err);
+          alert("Upload failed. Check console for details.");
+          setButtonState("Submit", false);
+        },
+        async () => {
+          // Get URL and save metadata
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          // Save document in Firestore
+          await addDoc(collection(db, "submissions"), {
+            student_name: name,
+            member: member,
+            club_name: club,
+            gender: gender,
+            class: cls,
+            category: category,
+            school: school,
+            residence: residence,
+            state: state,
+            district: district,
+            contact1: contact1,
+            contact2: contact2,
+            video_path: path,
+            video_url: downloadURL,
+            file_name: file.name,
+            file_size: file.size,
+            content_type: file.type,
+            created_at: serverTimestamp()
+          });
+
+          alert("Submission uploaded and saved. Thank you!");
+          form.reset();
+          setButtonState("Submit", false);
+        }
+      );
+
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Error saving submission. See console.");
+      setButtonState("Submit", false);
+    }
+  });
+</script>
+
 </body>
 </html>
