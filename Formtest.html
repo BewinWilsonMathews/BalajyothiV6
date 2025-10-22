@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Video Submission Form</title>
+  <style>
+    :root{ --accent:#4f46e5; --muted:#6b7280; --bg:#f7fbff; }
+    body{ font-family:Inter,system-ui,Arial,Helvetica,sans-serif; background:var(--bg); margin:0; padding:28px; color:#111827; }
+    .container{ max-width:900px; margin:0 auto; background:#fff; border-radius:12px; box-shadow:0 6px 24px rgba(15,23,42,0.06); padding:22px; }
+    h1{ margin:0 0 12px; font-size:20px; }
+    label{ display:block; font-size:13px; margin-top:12px; color:var(--muted); }
+    input[type="text"], input[type="email"], textarea { width:100%; padding:10px 12px; border:1px solid #e6e9ef; border-radius:8px; margin-top:6px; font-size:14px; }
+    textarea{ min-height:80px; resize:vertical; }
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+    .btn{ background:var(--accent); color:#fff; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600; }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; }
+    .file-info{ font-size:13px; color:var(--muted); margin-top:6px; }
+    progress{ width:100%; height:14px; margin-top:10px; border-radius:8px; }
+    .small{ font-size:13px; color:var(--muted); }
+    .nav{ display:flex; gap:8px; margin-bottom:12px; }
+    .chip{ background:#f1f5f9; padding:8px 10px; border-radius:999px; cursor:pointer; }
+    table{ width:100%; border-collapse:collapse; margin-top:12px; }
+    th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid #eef2f7; font-size:14px; }
+    .download-btn{ background:transparent; color:var(--accent); border:1px solid var(--accent); padding:6px 8px; border-radius:8px; cursor:pointer; }
+    .meta{ color:#475569; font-size:13px; }
+    .hint{ background:#fff8db; padding:8px 10px; border-radius:8px; color:#6b4b00; margin-top:10px; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="chip" id="viewUpload">Upload</div>
+      <div class="chip" id="viewList">List / Download</div>
+    </div>
+
+    <div id="uploadView">
+      <h1>Submit your video (max 200 MB)</h1>
+      <div class="hint">Each user will upload up to a ~5-minute video. Adjust max size as needed. Videos will be stored in Firebase Storage and the metadata saved in Firestore.</div>
+
+      <form id="submissionForm">
+        <label for="name">Full name</label>
+        <input id="name" name="name" type="text" required />
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+
+        <label for="notes">Notes / Title</label>
+        <textarea id="notes" name="notes"></textarea>
+
+        <label for="video">Select video file</label>
+        <input id="video" name="video" type="file" accept="video/*" required />
+        <div class="file-info" id="fileInfo">No file chosen</div>
+
+        <label class="small">Upload progress</label>
+        <progress id="progressBar" value="0" max="100" style="display:none"></progress>
+        <div class="row">
+          <button class="btn" id="startUpload" type="button">Upload & Save</button>
+          <div class="small" id="statusText"></div>
+        </div>
+      </form>
+    </div>
+
+    <div id="listView" style="display:none">
+      <h1>Submitted videos</h1>
+      <div class="small">Shows the latest submissions with download links.</div>
+      <table id="submissionsTable" aria-live="polite">
+        <thead>
+          <tr><th>Name</th><th>Title</th><th>Uploaded</th><th>Size</th><th>Action</th></tr>
+        </thead>
+        <tbody id="submissionsBody">
+          <!-- rows inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px" class="small">Replace the Firebase config below with your project details (see comments in code).</div>
+  </div>
+
+  <!-- Firebase SDKs (modular) -->
+  <script type="module">
+    // NOTE: Replace the placeholder values in firebaseConfig with your project's config.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+    // ---------- REPLACE THESE WITH YOUR FIREBASE CONFIG ----------
+    const firebaseConfig = {
+apiKey: "AIzaSyAsQsDsbTp_UB6qyDgxQLwhVBs9UrCuors",
+  authDomain: "elocution-form.firebaseapp.com",
+  projectId: "elocution-form",
+  storageBucket: "elocution-form.firebasestorage.app",
+  messagingSenderId: "936475111029",
+  appId: "1:936475111029:web:33e0ddff32913e0f2e923c"
+    };
+    // -----------------------------------------------------------
+
+    // init
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // UI refs
+    const fileInput = document.getElementById('video');
+    const fileInfo = document.getElementById('fileInfo');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const startUploadBtn = document.getElementById('startUpload');
+    const submissionsBody = document.getElementById('submissionsBody');
+
+    const MAX_BYTES = 200 * 1024 * 1024; // 200 MB max (adjust if needed)
+
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      if (!f) { fileInfo.textContent = 'No file chosen'; return; }
+      const mb = (f.size / (1024*1024)).toFixed(1);
+      fileInfo.textContent = `${f.name} — ${mb} MB — ${f.type}`;
+    });
+
+    // view switching
+    document.getElementById('viewUpload').addEventListener('click', () => {
+      document.getElementById('uploadView').style.display = '';
+      document.getElementById('listView').style.display = 'none';
+    });
+    document.getElementById('viewList').addEventListener('click', () => {
+      document.getElementById('uploadView').style.display = 'none';
+      document.getElementById('listView').style.display = '';
+      loadSubmissions();
+    });
+
+    // upload handler
+    startUploadBtn.addEventListener('click', async () => {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+      const file = fileInput.files[0];
+
+      if (!name || !email || !file) {
+        alert('Please fill name, email and choose a video file.');
+        return;
+      }
+
+      // client-side checks
+      if (file.size > MAX_BYTES) {
+        alert('File too large. Max allowed is 200 MB. If you expect 5-minute videos to be larger, increase limit on both client and rules.');
+        return;
+      }
+      if (!file.type.startsWith('video/')) {
+        alert('Please select a video file type.');
+        return;
+      }
+
+      // create a path: submissions/{timestamp}_{sanitizedName}_{filename}
+      const safeName = name.replace(/[^a-z0-9_\-]/gi,'_').slice(0,40);
+      const path = `submissions/${safeName}_${Date.now()}_${file.name}`;
+
+      try {
+        startUploadBtn.disabled = true;
+        statusText.textContent = 'Starting upload...';
+        progressBar.style.display = '';
+        progressBar.value = 0;
+
+        const sRef = storageRef(storage, path);
+        const uploadTask = uploadBytesResumable(sRef, file, { contentType: file.type });
+
+        uploadTask.on('state_changed', snapshot => {
+          const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          progressBar.value = pct;
+          statusText.textContent = `Uploading — ${pct.toFixed(1)}%`;
+        }, error => {
+          console.error('Upload error', error);
+          alert('Upload failed: ' + (error.message || error.toString()));
+          startUploadBtn.disabled = false;
+          statusText.textContent = 'Upload failed';
+        }, async () => {
+          // success
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          statusText.textContent = 'Saving metadata...';
+
+          // store metadata in Firestore
+          const docRef = await addDoc(collection(db, 'submissions'), {
+            name, email, notes,
+            storagePath: path,
+            downloadURL,
+            sizeBytes: file.size,
+            contentType: file.type,
+            createdAt: serverTimestamp()
+          });
+
+          statusText.textContent = 'Upload complete!';
+          progressBar.value = 100;
+          // reset form (optional)
+          document.getElementById('submissionForm').reset();
+          fileInfo.textContent = 'No file chosen';
+          startUploadBtn.disabled = false;
+
+          // optionally switch to list view automatically
+          // document.getElementById('viewList').click();
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Error: ' + (err.message || err.toString()));
+        startUploadBtn.disabled = false;
+      }
+    });
+
+    // load list of submissions (basic)
+    async function loadSubmissions() {
+      submissionsBody.innerHTML = '<tr><td colspan="5" class="meta">Loading...</td></tr>';
+      try {
+        const q = query(collection(db, 'submissions'), orderBy('createdAt','desc'));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          submissionsBody.innerHTML = '<tr><td colspan="5" class="meta">No submissions yet.</td></tr>';
+          return;
+        }
+        submissionsBody.innerHTML = '';
+        snap.forEach(doc => {
+          const data = doc.data();
+          const created = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toLocaleString() : '';
+          const sizeMB = data.sizeBytes ? (data.sizeBytes / (1024*1024)).toFixed(1) + ' MB' : '-';
+          const tr = document.createElement('tr');
+
+          tr.innerHTML = `
+            <td><div>${escapeHtml(data.name || '')}</div><div class="meta">${escapeHtml(data.email || '')}</div></td>
+            <td>${escapeHtml(data.notes || '')}</td>
+            <td>${created}</td>
+            <td>${sizeMB}</td>
+            <td><button class="download-btn" data-url="${escapeAttr(data.downloadURL || '')}">Download</button></td>
+          `;
+          submissionsBody.appendChild(tr);
+        });
+
+        // attach click handlers
+        document.querySelectorAll('.download-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const url = btn.getAttribute('data-url');
+            if (!url) { alert('No download URL available'); return; }
+            // open in new tab (browser will download or play)
+            window.open(url, '_blank', 'noopener');
+          });
+        });
+      } catch (err) {
+        console.error(err);
+        submissionsBody.innerHTML = `<tr><td colspan="5" class="meta">Error loading: ${err.message || err}</td></tr>`;
+      }
+    }
+
+    // small helpers to avoid XSS when injecting
+    function escapeHtml(s){ if(!s) return ''; return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+    function escapeAttr(s){ return escapeHtml(s).replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
+
+    // optionally preload the list
+    // loadSubmissions();
+  </script>
+</body>
+</html>
