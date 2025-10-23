@@ -184,6 +184,13 @@
     margin: 10px auto 18px auto;
   }
 
+  /* small helper text */
+  .helper {
+    font-size: 13px;
+    color: #6b7784;
+    margin-top: 6px;
+  }
+
   /* Responsive logos - shrink on small screens */
   @media (max-width: 820px) {
     .logo-header img { height: 56px; }
@@ -340,11 +347,23 @@
           <input id="contact2" name="contact2" type="tel" pattern="[0-9]{10}" placeholder="Alternate number (optional)">
         </div>
 
+        <!-- NEW: Google Drive link field and instructions -->
         <div class="form-group">
-          <label for="video">Upload Video (approx. 5 minutes)</label>
-          <input id="video" name="video" type="file" accept="video/*" required>
-          <p class="small" style="margin:8px 0 0 0;">Preferred formats: MP4 / MOV. Max size recommended: ~500MB (720p) to reduce upload issues.</p>
+          <label for="video_link">Google Drive Video Link (paste link here)</label>
+          <input id="video_link" name="video_link" type="text" placeholder="https://drive.google.com/..." >
+          <p class="helper">
+            <strong>How to get a shareable Drive link:</strong>
+            <ol style="margin:6px 0 0 18px; color:var(--muted-text); font-size:13px;">
+              <li>Upload your video to Google Drive (MP4/MOV recommended).</li>
+              <li>Right-click the file → <em>Get link</em> → Change access to <strong>"Anyone with the link"</strong> (or "Anyone with the link can view").</li>
+              <li>Copy the link and paste it above.</li>
+            </ol>
+          </p>
+          <label style="margin-top:8px; font-weight:600;">
+            <input id="drive_confirm" type="checkbox" /> &nbsp; I confirm that the link above is shareable ("Anyone with the link can view")
+          </label>
         </div>
+
       </div>
 
       <button type="submit">Submit</button>
@@ -402,113 +421,98 @@
     }
   });
 
-  // ---- 4) Form submit + upload logic (no auth) ----
+  // ---- 4) Form submit logic (SAVE drive link to Firestore) ----
   const form = document.getElementById("submissionForm");
-  const fileInput = document.getElementById("video");
   const submitBtn = form.querySelector('button[type="submit"]');
+  const driveConfirmEl = document.getElementById("drive_confirm");
+  const videoLinkEl = document.getElementById("video_link");
 
   function setButtonState(text, disabled = false) {
     submitBtn.textContent = text;
     submitBtn.disabled = disabled;
   }
 
-  function showProgress(pct) {
-    setButtonState(pct < 100 ? `Uploading... ${Math.round(pct)}%` : `Saving...`, pct < 100);
+  // basic link check: presence and contains drive.google or docs.google or shortened goo.gl/drive link
+  function looksLikeDriveLink(url) {
+    if (!url) return false;
+    try {
+      const u = new URL(url);
+      return u.hostname.includes("drive.google.com") || u.hostname.includes("docs.google.com") || url.includes("drive.google");
+    } catch (err) {
+      return false;
+    }
   }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("Please select a video file to upload.");
-      return;
-    }
-
-    // Client-side size limit (600 MB)
-    const MAX_BYTES = 600 * 1024 * 1024;
-    if (file.size > MAX_BYTES) {
-      alert("Video too large. Please upload a file smaller than 600 MB.");
-      return;
-    }
-
-    // Read form fields
-    const name = document.getElementById("student_name").value.trim();
-    const contact1 = document.getElementById("contact1").value.trim();
-    const contact2 = document.getElementById("contact2").value.trim();
-    const club = document.getElementById("club_name").value.trim();
-    const genderEl = form.querySelector('input[name="gender"]:checked');
-    const gender = genderEl ? genderEl.value : "";
-    const memberEl = form.querySelector('input[name="member"]:checked');
-    const member = memberEl ? memberEl.value : "";
-    const cls = document.getElementById("class_studying").value.trim();
-    const category = document.getElementById("category").value;
-    const school = document.getElementById("school").value.trim();
-    const residence = document.getElementById("residence").value.trim();
-    const state = document.getElementById("state").value;
-    const district = document.getElementById("district").value;
-
-    if (!name || !contact1) {
-      alert("Please fill required fields.");
-      return;
-    }
+    setButtonState("Saving...", true);
 
     try {
-      setButtonState("Preparing upload...", true);
+      // Collect form field values
+      const name = document.getElementById("student_name").value.trim();
+      const contact1 = document.getElementById("contact1").value.trim();
+      const contact2 = document.getElementById("contact2").value.trim();
+      const club = document.getElementById("club_name").value.trim();
+      const genderEl = form.querySelector('input[name="gender"]:checked');
+      const gender = genderEl ? genderEl.value : "";
+      const memberEl = form.querySelector('input[name="member"]:checked');
+      const member = memberEl ? memberEl.value : "";
+      const cls = document.getElementById("class_studying").value.trim();
+      const category = document.getElementById("category").value;
+      const school = document.getElementById("school").value.trim();
+      const residence = document.getElementById("residence").value.trim();
+      const state = document.getElementById("state").value;
+      const district = document.getElementById("district").value;
 
-      // Storage path (timestamp + safe filename)
-      const ts = Date.now();
-      const safeFileName = file.name.replace(/\s+/g, "_").replace(/[^\w\-.]/g, "");
-      const path = `submissions/${ts}_${safeFileName}`;
-      const sRef = storageRef(storage, path);
+      // NEW: video link validation
+      const video_link = videoLinkEl.value.trim();
+      const drive_confirm = !!driveConfirmEl.checked;
 
-      const uploadTask = uploadBytesResumable(sRef, file, { contentType: file.type });
-
-      uploadTask.on('state_changed',
-        (snapshot) => {
-          const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          showProgress(pct);
-        },
-        (err) => {
-          console.error("Upload failed:", err);
-          alert("Upload failed. Check console for details.");
+      // If user provided a link, require confirmation and some basic validation
+      if (video_link) {
+        if (!looksLikeDriveLink(video_link)) {
+          alert("Please paste a valid Google Drive link (it should contain drive.google.com or docs.google.com).");
           setButtonState("Submit", false);
-        },
-        async () => {
-          // Get URL and save metadata
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-          // Save document in Firestore
-          await addDoc(collection(db, "submissions"), {
-            student_name: name,
-            member: member,
-            club_name: club,
-            gender: gender,
-            class: cls,
-            category: category,
-            school: school,
-            residence: residence,
-            state: state,
-            district: district,
-            contact1: contact1,
-            contact2: contact2,
-            video_path: path,
-            video_url: downloadURL,
-            file_name: file.name,
-            file_size: file.size,
-            content_type: file.type,
-            created_at: serverTimestamp()
-          });
-
-          alert("Submission uploaded and saved. Thank you!");
-          form.reset();
-          setButtonState("Submit", false);
+          return;
         }
-      );
+        if (!drive_confirm) {
+          alert("Please confirm that you have set the Drive file's sharing to 'Anyone with the link can view'.");
+          setButtonState("Submit", false);
+          return;
+        }
+      } else {
+        // If link is optional but not provided, proceed — change this if you want it required
+        // alert("Please paste your Google Drive video link before submitting.");
+        // setButtonState("Submit", false);
+        // return;
+      }
+
+      // Save form data (including drive link) to Firestore
+      await addDoc(collection(db, "submissions"), {
+        student_name: name,
+        member: member,
+        club_name: club,
+        gender: gender,
+        class: cls,
+        category: category,
+        school: school,
+        residence: residence,
+        state: state,
+        district: district,
+        contact1: contact1,
+        contact2: contact2,
+        video_link: video_link || null,
+        drive_link_confirmed: drive_confirm,
+        created_at: serverTimestamp()
+      });
+
+      alert("Form submitted successfully! Your data has been saved.");
+      form.reset();
+      setButtonState("Submit", false);
 
     } catch (err) {
-      console.error("Submission error:", err);
-      alert("Error saving submission. See console.");
+      console.error("Error saving data:", err);
+      alert("Error saving your data. Please check console for details.");
       setButtonState("Submit", false);
     }
   });
