@@ -350,7 +350,7 @@
         <!-- NEW: Google Drive link field and instructions -->
         <div class="form-group">
           <label for="video_link">Google Drive Video Link (paste link here)</label>
-          <input id="video_link" name="video_link" type="text" placeholder="https://drive.google.com/..." >
+          <input id="video_link" name="video_link" type="text" placeholder="https://drive.google.com/..." required>
           <p class="helper">
             <strong>How to get a shareable Drive link:</strong>
             <ol style="margin:6px 0 0 18px; color:var(--muted-text); font-size:13px;">
@@ -360,7 +360,7 @@
             </ol>
           </p>
           <label style="margin-top:8px; font-weight:600;">
-            <input id="drive_confirm" type="checkbox" /> &nbsp; I confirm that the link above is shareable ("Anyone with the link can view")
+            <input id="drive_confirm" type="checkbox" required/> &nbsp; I confirm that the link above is shareable ("Anyone with the link can view")
           </label>
         </div>
 
@@ -464,28 +464,31 @@
       const state = document.getElementById("state").value;
       const district = document.getElementById("district").value;
 
-      // NEW: video link validation
-      const video_link = videoLinkEl.value.trim();
-      const drive_confirm = !!driveConfirmEl.checked;
+// NEW: video link validation (REQUIRED)
+const video_link = videoLinkEl.value.trim();
+const drive_confirm = !!driveConfirmEl.checked;
 
-      // If user provided a link, require confirmation and some basic validation
-      if (video_link) {
-        if (!looksLikeDriveLink(video_link)) {
-          alert("Please paste a valid Google Drive link (it should contain drive.google.com or docs.google.com).");
-          setButtonState("Submit", false);
-          return;
-        }
-        if (!drive_confirm) {
-          alert("Please confirm that you have set the Drive file's sharing to 'Anyone with the link can view'.");
-          setButtonState("Submit", false);
-          return;
-        }
-      } else {
-        // If link is optional but not provided, proceed — change this if you want it required
-        // alert("Please paste your Google Drive video link before submitting.");
-        // setButtonState("Submit", false);
-        // return;
-      }
+// 1) Require presence
+if (!video_link) {
+  alert("Please paste your Google Drive video link before submitting.");
+  setButtonState("Submit", false);
+  return;
+}
+
+// 2) Basic shape check
+if (!looksLikeDriveLink(video_link)) {
+  alert("Please paste a valid Google Drive link (it should contain drive.google.com or docs.google.com).");
+  setButtonState("Submit", false);
+  return;
+}
+
+// 3) Require explicit confirmation checkbox
+if (!drive_confirm) {
+  alert("Please confirm that you have set the Drive file's sharing to 'Anyone with the link can view'.");
+  setButtonState("Submit", false);
+  return;
+}
+
 
       // Save form data (including drive link) to Firestore
       await addDoc(collection(db, "submissions"), {
@@ -520,5 +523,6 @@
 
 </body>
 </html>
+
 
 
